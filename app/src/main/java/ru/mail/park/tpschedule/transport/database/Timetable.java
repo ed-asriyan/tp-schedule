@@ -6,6 +6,8 @@ import android.util.Log;
 
 import java.util.Locale;
 
+import ru.mail.park.tpschedule.utils.ErrorMessage;
+
 /**
  * Created by lieroz
  * 06.11.17.
@@ -30,6 +32,7 @@ public class Timetable implements Table {
     private static final String KEY_TYPE_TITLE = "type_title";
     private static final String KEY_LESSON_TUTORS = "lesson_tutors";
 
+    @Override
     public boolean createTable(SQLiteDatabase db) {
         String CREATE_TIMETABLE_TABLE = "CREATE TABLE " + TABLE_TIMETABLE +
                 "(" +
@@ -48,19 +51,18 @@ public class Timetable implements Table {
         try {
             db.execSQL(CREATE_TIMETABLE_TABLE);
         } catch (SQLException e) {
-            String errorStringFormat = "error: %s, line: %d\n";
-            Log.d(TAG, String.format(Locale.ENGLISH, errorStringFormat, e.toString(), e.getStackTrace()[2].getLineNumber()));
+            Log.d(TAG, new ErrorMessage(e).toString());
             return false;
         }
         return true;
     }
 
+    @Override
     public boolean dropTable(SQLiteDatabase db) {
         try {
             db.execSQL("DROP TABLE " + TABLE_TIMETABLE);
         } catch (SQLException e) {
-            String errorStringFormat = "error: %s, line: %d\n";
-            Log.d(TAG, String.format(Locale.ENGLISH, errorStringFormat, e.toString(), e.getStackTrace()[2].getLineNumber()));
+            Log.d(TAG, new ErrorMessage(e).toString());
             return false;
         }
         return true;
