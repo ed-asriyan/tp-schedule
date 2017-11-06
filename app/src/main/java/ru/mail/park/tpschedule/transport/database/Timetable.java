@@ -4,8 +4,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.util.Locale;
-
 import ru.mail.park.tpschedule.utils.ErrorMessage;
 
 /**
@@ -13,6 +11,7 @@ import ru.mail.park.tpschedule.utils.ErrorMessage;
  * 06.11.17.
  */
 
+@SuppressWarnings({"unused", "FieldCanBeLocal", "WeakerAccess"})
 public class Timetable implements Table {
     private static final String TAG = Timetable.class.getSimpleName();
 

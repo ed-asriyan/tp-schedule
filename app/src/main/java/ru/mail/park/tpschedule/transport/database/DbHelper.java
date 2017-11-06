@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  * 06.11.17.
  */
 
+
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DbHelper extends SQLiteOpenHelper {
     private static DbHelper INSTANCE;
 

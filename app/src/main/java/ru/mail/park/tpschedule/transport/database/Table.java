@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
  * 06.11.17.
  */
 
+@SuppressWarnings({"unused", "WeakerAccess"})
+
 public interface Table {
     boolean createTable(SQLiteDatabase db);
     boolean dropTable(SQLiteDatabase db);
