@@ -2,6 +2,8 @@ package ru.mail.park.tpschedule.transport;
 
 import android.content.Context;
 
+import com.google.common.collect.Lists;
+
 import ru.mail.park.tpschedule.transport.database.DatabaseManager;
 import ru.mail.park.tpschedule.transport.network.NetworkManager;
 
@@ -16,5 +18,9 @@ public class TransportFacade {
     public TransportFacade(Context context) {
         databaseManager = DatabaseManager.getInstance(context);
         networkManager = NetworkManager.getInstance();
+    }
+
+    public void updateTimetable() {
+        networkManager.getTimetable(Lists.newArrayList("АПО-31", "АПО-11"));
     }
 }

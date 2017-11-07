@@ -7,19 +7,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ru.mail.park.tpschedule.transport.database.TimetableModel;
-import ru.mail.park.tpschedule.transport.network.ResponseObject;
+import ru.mail.park.tpschedule.transport.network.ParkResponse;
 
 /**
  * Created by lieroz
  * 07.11.17
  */
 
-// TODO think about making it template to handle more general objects
-
 public class MapBuilder {
-    public static Map<String, List<TimetableModel>> toMap(List<ResponseObject> sourceList, List<String> filters) {
+    public static Map<String, List<TimetableModel>> toMap(List<ParkResponse.ResponseObject> sourceList, List<String> filters) {
         Map<String, List<TimetableModel>> map = new TreeMap<>();
-        for (ResponseObject object : sourceList) {
+        for (ParkResponse.ResponseObject object : sourceList) {
             for (String subgroup : object.getSubgroups()) {
                 if (filters.contains(subgroup)) {
                     if (map.containsKey(subgroup)) {

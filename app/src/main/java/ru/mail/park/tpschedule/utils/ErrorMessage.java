@@ -12,9 +12,9 @@ public class ErrorMessage {
     private String message;
     private int lineNumber;
 
-    public ErrorMessage(Exception exception) {
-        this.message = exception.getMessage();
-        this.lineNumber = exception.getStackTrace()[2].getLineNumber();
+    public ErrorMessage(Throwable error) {
+        this.message = error.getMessage();
+        this.lineNumber = error.getStackTrace()[2].getLineNumber();
     }
 
     @Override

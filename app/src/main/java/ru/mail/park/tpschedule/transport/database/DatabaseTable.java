@@ -5,5 +5,5 @@ package ru.mail.park.tpschedule.transport.database;
  * 06.11.17
  */
 
-interface DatabaseTable {
+public interface DatabaseTable {
 }

@@ -21,8 +21,7 @@ import ru.mail.park.tpschedule.utils.ErrorMessage;
  * 06.11.17.
  */
 
-@SuppressWarnings({"unused", "FieldCanBeLocal", "WeakerAccess"})
-class Timetable implements DatabaseTable {
+public class Timetable implements DatabaseTable {
     private static final String TAG = Timetable.class.getSimpleName();
 
     // DatabaseTable name

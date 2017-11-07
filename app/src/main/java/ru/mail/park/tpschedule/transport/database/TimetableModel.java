@@ -2,14 +2,13 @@ package ru.mail.park.tpschedule.transport.database;
 
 import java.util.List;
 
-import ru.mail.park.tpschedule.transport.network.ResponseObject;
+import ru.mail.park.tpschedule.transport.network.ParkResponse;
 
 /**
  * Created by lieroz
  * 06.11.17.
  */
 
-@SuppressWarnings({"unused", "WeakerAccess"})
 public class TimetableModel implements DatabaseEntity {
     private String title;
     private String lessonTitle;
@@ -42,7 +41,7 @@ public class TimetableModel implements DatabaseEntity {
         this.lessonTutors = lessonTutors;
     }
 
-    public TimetableModel(ResponseObject object) {
+    public TimetableModel(ParkResponse.ResponseObject object) {
         this.title = object.getTitle();
         this.lessonTitle = object.getLessonTitle();
         this.startTime = object.getStartTime();

@@ -12,7 +12,6 @@ import java.util.Map;
  */
 
 
-@SuppressWarnings({"unused"})
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String TAG = DatabaseManager.class.getSimpleName();
 

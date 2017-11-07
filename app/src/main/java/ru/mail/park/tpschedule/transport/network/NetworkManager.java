@@ -3,16 +3,19 @@ package ru.mail.park.tpschedule.transport.network;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.mail.park.tpschedule.transport.database.TimetableModel;
+import ru.mail.park.tpschedule.utils.ErrorMessage;
 import ru.mail.park.tpschedule.utils.MapBuilder;
 
 /**
@@ -20,14 +23,13 @@ import ru.mail.park.tpschedule.utils.MapBuilder;
  * 06.11.17
  */
 
-@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class NetworkManager {
     private static final String TAG = NetworkManager.class.getSimpleName();
 
     private static NetworkManager INSTANCE;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final TechnoparkApi technoparkApi;
-    private Call<List<ResponseObject>> currentTpApiCall;
+    private Call<ParkResponse> currentTpApiCall;
 
     private static final String HOST = "https://park.mail.ru";
 
@@ -48,16 +50,23 @@ public class NetworkManager {
 
     public void getTimetable(final List<String> groups) {
         currentTpApiCall = technoparkApi.getTimetable(0, 0, "semester");
-        currentTpApiCall.enqueue(new Callback<List<ResponseObject>>() {
+        currentTpApiCall.enqueue(new Callback<ParkResponse>() {
             @Override
-            public void onResponse(@NonNull Call<List<ResponseObject>> call, @NonNull Response<List<ResponseObject>> response) {
-                if (response.isSuccessful()) {
-                    invokeSuccess(MapBuilder.toMap(response.body(), groups));
+            public void onResponse(@NonNull Call<ParkResponse> call, @NonNull Response<ParkResponse> response) {
+                try {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<ParkResponse.ResponseObject> objects = response.body().getSchedule();
+                        invokeSuccess(MapBuilder.toMap(objects, groups));
+                    } else {
+                        throw new HttpException(response);
+                    }
+                } catch (HttpException e) {
+                    invokeError(e);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<ResponseObject>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ParkResponse> call, @NonNull Throwable t) {
                 if (!call.isCanceled()) {
                     invokeError(t);
                 }
@@ -65,11 +74,16 @@ public class NetworkManager {
         });
     }
 
+    // TODO add some callback handler here to return to facade
     private void invokeSuccess(final Map<String, List<TimetableModel>> timetable) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                // TODO some good activity
+                for (String key : timetable.keySet()) {
+                    for (TimetableModel t : timetable.get(key)) {
+                        Log.d(TAG, key + " -> " + t.getTitle());
+                    }
+                }
             }
         });
     }
@@ -78,7 +92,7 @@ public class NetworkManager {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                // TODO some error activity
+                Log.d(TAG, new ErrorMessage(error).toString());
             }
         });
     }
