@@ -9,7 +9,7 @@ import java.util.List;
  * 06.11.17.
  */
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused"})
 public class ResponseObject {
     @SerializedName("short_title")
     private String title;

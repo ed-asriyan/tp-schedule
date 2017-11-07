@@ -11,8 +11,7 @@ import retrofit2.http.Query;
  * 06.11.17
  */
 
-@SuppressWarnings({"WeakerAccess"})
-public interface TechnoparkApi {
+interface TechnoparkApi {
     @GET("/schedule/calendar_gtp")
     Call<List<ResponseObject>> getTimetable(@Query("start") int start,
                                             @Query("end") int end,

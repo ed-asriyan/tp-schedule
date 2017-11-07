@@ -14,6 +14,8 @@ import ru.mail.park.tpschedule.transport.network.ResponseObject;
  * 07.11.17
  */
 
+// TODO think about making it template to handle more general objects
+
 public class MapBuilder {
     public static Map<String, List<TimetableModel>> toMap(List<ResponseObject> sourceList, List<String> filters) {
         Map<String, List<TimetableModel>> map = new TreeMap<>();

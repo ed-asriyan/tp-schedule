@@ -10,7 +10,7 @@ import ru.mail.park.tpschedule.transport.network.ResponseObject;
  */
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class TimetableModel implements Entity {
+public class TimetableModel implements DatabaseEntity {
     private String title;
     private String lessonTitle;
     private String startTime;

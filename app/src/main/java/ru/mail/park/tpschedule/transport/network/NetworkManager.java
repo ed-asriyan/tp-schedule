@@ -20,7 +20,7 @@ import ru.mail.park.tpschedule.utils.MapBuilder;
  * 06.11.17
  */
 
-@SuppressWarnings({"unused", "FieldCanBeLocal", "WeakerAccess"})
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class NetworkManager {
     private static final String TAG = NetworkManager.class.getSimpleName();
 
