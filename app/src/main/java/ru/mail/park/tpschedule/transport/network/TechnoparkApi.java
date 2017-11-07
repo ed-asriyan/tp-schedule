@@ -9,7 +9,7 @@ import retrofit2.http.Query;
  * 06.11.17
  */
 
-public interface TechnoparkApi {
+interface TechnoparkApi {
     @GET("/schedule/calendar_gtp")
     Call<ParkResponse> getTimetable(@Query("start") int start,
                                     @Query("end") int end,

@@ -1,5 +1,7 @@
 package ru.mail.park.tpschedule.transport.network;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -13,6 +15,7 @@ public class ParkResponse {
     @SerializedName("aSchedule")
     private List<ResponseObject> schedule;
 
+    @NonNull
     public List<ResponseObject> getSchedule() {
         return schedule;
     }
@@ -38,6 +41,8 @@ public class ParkResponse {
         private String typeTitle;
         @SerializedName("lesson_tutors")
         private List<String> lessonTutors;
+        @SerializedName("type_entity")
+        private String typeEntity;
 
         public String getTitle() {
             return title;
@@ -77,6 +82,10 @@ public class ParkResponse {
 
         public List<String> getLessonTutors() {
             return lessonTutors;
+        }
+
+        public String getTypeEntity() {
+            return typeEntity;
         }
     }
 }

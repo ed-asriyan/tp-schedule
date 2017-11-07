@@ -2,10 +2,11 @@ package ru.mail.park.tpschedule.transport;
 
 import android.content.Context;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 import ru.mail.park.tpschedule.transport.database.DatabaseManager;
 import ru.mail.park.tpschedule.transport.network.NetworkManager;
+import ru.mail.park.tpschedule.transport.network.OnScheduleGetListener;
 
 /**
  * Created by ed on 07.11.17
@@ -20,7 +21,7 @@ public class TransportFacade {
         networkManager = NetworkManager.getInstance();
     }
 
-    public void updateTimetable() {
-        networkManager.getTimetable(Lists.newArrayList("АПО-31", "АПО-11"));
+    public void updateTimetable(List<String> groups, int start, int end, String interval, OnScheduleGetListener listener) {
+        networkManager.getTimetable(groups, start, end, interval, listener);
     }
 }
