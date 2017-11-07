@@ -3,12 +3,9 @@ package ru.mail.park.tpschedule.transport.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.List;
 import java.util.Map;
-
-import ru.mail.park.tpschedule.utils.ErrorMessage;
 
 /**
  * Created by ed on 07.11.17
