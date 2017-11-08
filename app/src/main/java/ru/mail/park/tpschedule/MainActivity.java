@@ -9,10 +9,13 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import ru.mail.park.tpschedule.transport.TransportFacade;
-import ru.mail.park.tpschedule.transport.database.TimetableModel;
-import ru.mail.park.tpschedule.transport.network.OnScheduleGetListener;
+import ru.mail.park.tpschedule.database.DatabaseManager;
+import ru.mail.park.tpschedule.database.TimetableModel;
+import ru.mail.park.tpschedule.network.NetworkManager;
+import ru.mail.park.tpschedule.network.OnScheduleGetListener;
 import ru.mail.park.tpschedule.utils.ErrorMessage;
 
 /*
@@ -26,7 +29,10 @@ import ru.mail.park.tpschedule.utils.ErrorMessage;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private TransportFacade transportFacade;
+    private static NetworkManager networkManager;
+    private static DatabaseManager databaseManager;
+
+    private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
 
     /*
      * Called after timetable was returned from network request to TP server
@@ -34,9 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private OnScheduleGetListener onScheduleGetListener = new OnScheduleGetListener() {
         // All updates write here
         @Override
-        public void onSuccess(Map<String, List<TimetableModel>> schedule) {
-            for (String group : schedule.keySet()) {
-                for (TimetableModel model : schedule.get(group)) {
+        public void onSuccess(Map<String, List<TimetableModel>> result) {
+            for (String group : result.keySet()) {
+                for (TimetableModel model : result.get(group)) {
                     Log.d(TAG, group + " -> " + model.getTitle());
                 }
             }
@@ -44,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onFailure(Throwable error) {
-            Toast.makeText(getApplicationContext(), new ErrorMessage(error).toString(), Toast.LENGTH_LONG).show();
+            String errorMessage = new ErrorMessage(error).toString();
+            Log.d(TAG, errorMessage);
+            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
         }
     };
 
@@ -53,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        transportFacade = new TransportFacade(getApplicationContext());
-        transportFacade.updateTimetable(Lists.newArrayList("АПО-31", "АПО-11"), 0, 0, "semester", onScheduleGetListener);
+        networkManager = NetworkManager.getInstance();
+        databaseManager = DatabaseManager.getInstance(getApplicationContext());
+
+        networkManager.getTimetable(Lists.newArrayList("АПО-31", "АПО-11"), 0, 0, "semester", onScheduleGetListener);
     }
 }

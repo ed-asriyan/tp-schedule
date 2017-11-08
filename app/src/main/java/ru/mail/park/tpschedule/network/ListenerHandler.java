@@ -1,4 +1,4 @@
-package ru.mail.park.tpschedule.transport.network;
+package ru.mail.park.tpschedule.network;
 
 import android.support.annotation.Nullable;
 

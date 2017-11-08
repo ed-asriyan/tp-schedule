@@ -1,4 +1,4 @@
-package ru.mail.park.tpschedule.transport.network;
+package ru.mail.park.tpschedule.network;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -6,20 +6,26 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import dagger.Module;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.mail.park.tpschedule.transport.database.TimetableModel;
+import ru.mail.park.tpschedule.database.DatabaseManager;
+import ru.mail.park.tpschedule.database.TimetableModel;
+import ru.mail.park.tpschedule.utils.ContainerBuilder;
 
 /**
  * Created by lieroz
  * 06.11.17
  */
 
+@Module
 @SuppressWarnings({"FieldCanBeLocal"})
 public class NetworkManager {
     private static final String TAG = NetworkManager.class.getSimpleName();
@@ -28,6 +34,7 @@ public class NetworkManager {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final TechnoparkApi technoparkApi;
     private Call<ParkResponse> currentCall;
+    private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
 
     private static final String HOST = "https://park.mail.ru";
 
@@ -52,8 +59,14 @@ public class NetworkManager {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         // TODO what to do will this highlight!??? NullPointerException
-                        List<ParkResponse.ResponseObject> objects = response.body().getSchedule();
-                        invokeSuccess(handler, MapBuilder.toMap(objects, groups));
+                        final List<ParkResponse.ResponseObject> objects = response.body().getSchedule();
+//                        databaseExecutor.submit(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                DatabaseManager.getInstance().addTimetableEntries(objects);
+//                            }
+//                        });
+                        invokeSuccess(handler, ContainerBuilder.toMap(objects, groups));
                     } else {
                         throw new HttpException(response);
                     }

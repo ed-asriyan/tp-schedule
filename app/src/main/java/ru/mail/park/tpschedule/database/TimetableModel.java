@@ -1,8 +1,8 @@
-package ru.mail.park.tpschedule.transport.database;
+package ru.mail.park.tpschedule.database;
 
 import java.util.List;
 
-import ru.mail.park.tpschedule.transport.network.ParkResponse;
+import ru.mail.park.tpschedule.network.ParkResponse;
 
 /**
  * Created by lieroz

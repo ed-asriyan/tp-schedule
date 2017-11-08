@@ -1,4 +1,4 @@
-package ru.mail.park.tpschedule.transport.database;
+package ru.mail.park.tpschedule.database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -21,7 +21,7 @@ import ru.mail.park.tpschedule.utils.ErrorMessage;
  * 06.11.17.
  */
 
-public class Timetable implements DatabaseTable {
+class Timetable implements DatabaseTable {
     private static final String TAG = Timetable.class.getSimpleName();
 
     // DatabaseTable name
@@ -40,20 +40,20 @@ public class Timetable implements DatabaseTable {
     private static final String KEY_TYPE_TITLE = "type_title";
     private static final String KEY_LESSON_TUTORS = "lesson_tutors";
 
-    public boolean createTable(SQLiteDatabase db) {
+    boolean createTable(SQLiteDatabase db) {
         String CREATE_TIMETABLE_TABLE = "CREATE TABLE " + TABLE_TIMETABLE +
                 "(" +
-                KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                KEY_TITLE + " TEXT DEFAULT NULL," +
-                KEY_LESSON_TITLE + " TEXT DEFAULT NULL," +
-                KEY_START_TIME + " TEXT DEFAULT NULL," +
-                KEY_END_TIME + " TEXT DEFAULT NULL," +
-                KEY_LESSON_TOPIC + " TEXT DEFAULT NULL," +
-                KEY_AUDITORIUM_NUMBER + " TEXT DEFAULT NULL," +
-                KEY_SCHEDULE_DATE + " TEXT DEFAULT NULL" +
-                KEY_SUBGROUPS + " TEXT DEFAULT NULL" +
-                KEY_TYPE_TITLE + " TEXT DEFAULT NULL" +
-                KEY_LESSON_TUTORS + " TEXT DEFAULT NULL" +
+                    KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    KEY_TITLE + " TEXT DEFAULT NULL," +
+                    KEY_LESSON_TITLE + " TEXT DEFAULT NULL," +
+                    KEY_START_TIME + " TEXT DEFAULT NULL," +
+                    KEY_END_TIME + " TEXT DEFAULT NULL," +
+                    KEY_LESSON_TOPIC + " TEXT DEFAULT NULL," +
+                    KEY_AUDITORIUM_NUMBER + " TEXT DEFAULT NULL," +
+                    KEY_SCHEDULE_DATE + " TEXT DEFAULT NULL" +
+                    KEY_SUBGROUPS + " TEXT DEFAULT NULL" +
+                    KEY_TYPE_TITLE + " TEXT DEFAULT NULL" +
+                    KEY_LESSON_TUTORS + " TEXT DEFAULT NULL" +
                 ")";
         try {
             db.execSQL(CREATE_TIMETABLE_TABLE);
@@ -64,7 +64,7 @@ public class Timetable implements DatabaseTable {
         return true;
     }
 
-    public boolean dropTable(SQLiteDatabase db) {
+    boolean dropTable(SQLiteDatabase db) {
         try {
             db.execSQL("DROP TABLE " + TABLE_TIMETABLE);
         } catch (SQLException e) {
@@ -74,7 +74,7 @@ public class Timetable implements DatabaseTable {
         return true;
     }
 
-    public boolean addEntries(SQLiteDatabase db, List<TimetableModel> objects) {
+    boolean addEntries(SQLiteDatabase db, List<TimetableModel> objects) {
         if (objects == null || objects.isEmpty()) {
             return false;
         }
@@ -122,7 +122,7 @@ public class Timetable implements DatabaseTable {
         return true;
     }
 
-    public Map<String, List<TimetableModel>> getEntries(SQLiteDatabase db, List<String> filters, String start, String end) {
+    Map<String, List<TimetableModel>> getEntries(SQLiteDatabase db, List<String> filters, String start, String end) {
         Map<String, List<TimetableModel>> map = new TreeMap<>();
         String SELECT_SQL = String.format("SELECT * FROM %s", TABLE_TIMETABLE);
         Cursor cursor = db.rawQuery(SELECT_SQL, null);

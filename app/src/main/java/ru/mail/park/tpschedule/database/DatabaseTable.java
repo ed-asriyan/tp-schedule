@@ -1,4 +1,4 @@
-package ru.mail.park.tpschedule.transport.database;
+package ru.mail.park.tpschedule.database;
 
 /**
  * Created by lieroz

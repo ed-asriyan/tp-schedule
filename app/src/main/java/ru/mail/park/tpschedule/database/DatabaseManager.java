@@ -1,4 +1,4 @@
-package ru.mail.park.tpschedule.transport.database;
+package ru.mail.park.tpschedule.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +10,6 @@ import java.util.Map;
 /**
  * Created by ed on 07.11.17
  */
-
 
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String TAG = DatabaseManager.class.getSimpleName();

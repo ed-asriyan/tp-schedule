@@ -1,9 +1,9 @@
-package ru.mail.park.tpschedule.transport.network;
+package ru.mail.park.tpschedule.network;
 
 import java.util.List;
 import java.util.Map;
 
-import ru.mail.park.tpschedule.transport.database.TimetableModel;
+import ru.mail.park.tpschedule.database.TimetableModel;
 
 /**
  * Created by yaches on 08.11.17
