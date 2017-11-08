@@ -14,8 +14,6 @@ import java.util.Map;
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String TAG = DatabaseManager.class.getSimpleName();
 
-    private static DatabaseManager INSTANCE;
-
     // Database info
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "tp_schedule";
@@ -23,15 +21,8 @@ public class DatabaseManager extends SQLiteOpenHelper {
     // Database entities
     private final Timetable timetable = new Timetable();
 
-    private DatabaseManager(Context context) {
+    public DatabaseManager(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    public static synchronized DatabaseManager getInstance(Context context) {
-        if (INSTANCE == null) {
-            INSTANCE = new DatabaseManager(context.getApplicationContext());
-        }
-        return INSTANCE;
     }
 
     @Override

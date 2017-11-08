@@ -12,25 +12,29 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
 import ru.mail.park.tpschedule.database.DatabaseManager;
 import ru.mail.park.tpschedule.database.TimetableModel;
+import ru.mail.park.tpschedule.injection.App;
 import ru.mail.park.tpschedule.network.NetworkManager;
 import ru.mail.park.tpschedule.network.OnScheduleGetListener;
+import ru.mail.park.tpschedule.network.ParkResponse;
+import ru.mail.park.tpschedule.utils.ContainerBuilder;
 import ru.mail.park.tpschedule.utils.ErrorMessage;
 
 /*
  * TODO 1) implement logic for network manager to handle updates greatly
  * TODO 2) consider restructuring database
- * TODO 3) think on how to make MapBuilder templated
- * TODO 4) implement transport facade
- * TODO 5) test for work
  */
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static NetworkManager networkManager;
-    private static DatabaseManager databaseManager;
+    @Inject
+    NetworkManager networkManager;
+    @Inject
+    DatabaseManager databaseManager;
 
     private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
 
@@ -40,9 +44,16 @@ public class MainActivity extends AppCompatActivity {
     private OnScheduleGetListener onScheduleGetListener = new OnScheduleGetListener() {
         // All updates write here
         @Override
-        public void onSuccess(Map<String, List<TimetableModel>> result) {
-            for (String group : result.keySet()) {
-                for (TimetableModel model : result.get(group)) {
+        public void onSuccess(final List<ParkResponse.ResponseObject> schedule, List<String> filter) {
+//            databaseExecutor.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    databaseManager.addTimetableEntries(ContainerBuilder.toList(schedule));
+//                }
+//            });
+            Map<String, List<TimetableModel>> filteredSchedule = ContainerBuilder.toMap(schedule, filter);
+            for (String group : filteredSchedule.keySet()) {
+                for (TimetableModel model : filteredSchedule.get(group)) {
                     Log.d(TAG, group + " -> " + model.getTitle());
                 }
             }
@@ -61,8 +72,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        networkManager = NetworkManager.getInstance();
-        databaseManager = DatabaseManager.getInstance(getApplicationContext());
+        App.getComponent().inject(this);
 
         networkManager.getTimetable(Lists.newArrayList("АПО-31", "АПО-11"), 0, 0, "semester", onScheduleGetListener);
     }

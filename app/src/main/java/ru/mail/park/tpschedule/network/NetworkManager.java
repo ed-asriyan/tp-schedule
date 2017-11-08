@@ -6,17 +6,13 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import dagger.Module;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.mail.park.tpschedule.database.DatabaseManager;
 import ru.mail.park.tpschedule.database.TimetableModel;
 import ru.mail.park.tpschedule.utils.ContainerBuilder;
 
@@ -25,20 +21,17 @@ import ru.mail.park.tpschedule.utils.ContainerBuilder;
  * 06.11.17
  */
 
-@Module
 @SuppressWarnings({"FieldCanBeLocal"})
 public class NetworkManager {
     private static final String TAG = NetworkManager.class.getSimpleName();
 
-    private static NetworkManager INSTANCE = new NetworkManager();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final TechnoparkApi technoparkApi;
     private Call<ParkResponse> currentCall;
-    private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
 
     private static final String HOST = "https://park.mail.ru";
 
-    private NetworkManager() {
+    public NetworkManager() {
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -46,11 +39,8 @@ public class NetworkManager {
         technoparkApi = retrofit.create(TechnoparkApi.class);
     }
 
-    public static NetworkManager getInstance() {
-        return INSTANCE;
-    }
-
-    public ListenerHandler<OnScheduleGetListener> getTimetable(final List<String> groups, int start, int end, String interval, final OnScheduleGetListener listener) {
+    public ListenerHandler<OnScheduleGetListener> getTimetable(final List<String> groups, int start, int end, String interval,
+                                                               final OnScheduleGetListener listener) {
         final ListenerHandler<OnScheduleGetListener> handler = new ListenerHandler<>(listener);
         currentCall = technoparkApi.getTimetable(end, start, interval);
         currentCall.enqueue(new Callback<ParkResponse>() {
@@ -59,14 +49,8 @@ public class NetworkManager {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
                         // TODO what to do will this highlight!??? NullPointerException
-                        final List<ParkResponse.ResponseObject> objects = response.body().getSchedule();
-//                        databaseExecutor.submit(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                DatabaseManager.getInstance().addTimetableEntries(objects);
-//                            }
-//                        });
-                        invokeSuccess(handler, ContainerBuilder.toMap(objects, groups));
+                        final List<ParkResponse.ResponseObject> schedule = response.body().getSchedule();
+                        invokeSuccess(handler, schedule, groups);
                     } else {
                         throw new HttpException(response);
                     }
@@ -85,13 +69,14 @@ public class NetworkManager {
         return handler;
     }
 
-    private void invokeSuccess(final ListenerHandler<OnScheduleGetListener> handler, final Map<String, List<TimetableModel>> timetable) {
+    private void invokeSuccess(final ListenerHandler<OnScheduleGetListener> handler,
+                               final List<ParkResponse.ResponseObject> schedule, final List<String> groups) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
                 OnScheduleGetListener listener = handler.getListener();
                 if (listener != null) {
-                    listener.onSuccess(timetable);
+                    listener.onSuccess(schedule, groups);
                 }
             }
         });
