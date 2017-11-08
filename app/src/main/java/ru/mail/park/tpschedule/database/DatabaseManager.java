@@ -46,8 +46,24 @@ public class DatabaseManager extends SQLiteOpenHelper {
         }
     }
 
-    public boolean updateTimetable(List<TimetableModel> schedule) {
-        return false;
+    public void clearTables() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        timetable.clearTable(db);
+        db.endTransaction();
+    }
+
+    public void dropTables() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        timetable.dropTable(db);
+        db.endTransaction();
+    }
+
+    public boolean updateSchedule(List<TimetableModel> schedule) {
+        SQLiteDatabase db = getWritableDatabase();
+        timetable.clearTable(db);
+        return timetable.addEntries(db, schedule);
     }
 
     public boolean addTimetableEntries(List<TimetableModel> schedule) {
@@ -58,5 +74,10 @@ public class DatabaseManager extends SQLiteOpenHelper {
     public Map<String, List<TimetableModel>> getTimetableEntries(List<String> filters, String start, String end) {
         SQLiteDatabase db = getReadableDatabase();
         return timetable.getEntries(db, filters, start, end);
+    }
+
+    public int getTimetableEntriesCount() {
+        SQLiteDatabase db = getReadableDatabase();
+        return timetable.countTableEntries(db);
     }
 }

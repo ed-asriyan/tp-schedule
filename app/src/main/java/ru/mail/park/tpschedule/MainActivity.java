@@ -3,9 +3,12 @@ package ru.mail.park.tpschedule;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -15,7 +18,9 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ru.mail.park.tpschedule.database.DatabaseManager;
 import ru.mail.park.tpschedule.database.TimetableModel;
 import ru.mail.park.tpschedule.injection.App;
@@ -38,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     DatabaseManager databaseManager;
 
+    // Wrap all database communication into this executor
     private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
 
     /*
@@ -50,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             databaseExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    databaseManager.addTimetableEntries(ContainerBuilder.toList(schedule));
+                    databaseManager.updateSchedule(ContainerBuilder.toList(schedule));
                 }
             });
             Map<String, List<TimetableModel>> filteredSchedule = ContainerBuilder.toMap(schedule, filter);
@@ -69,6 +75,28 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @BindView(R.id.update_button)
+    Button updateButton;
+    @BindView(R.id.get_count_button)
+    Button getCountButton;
+    @BindView(R.id.groups_field)
+    EditText groupsEdit;
+
+    @OnClick(R.id.update_button)
+    void onUpdateButtonClick() {
+        List<String> groups = Lists.newArrayList(Splitter.on(",")
+                        .trimResults()
+                        .omitEmptyStrings()
+                        .splitToList(groupsEdit.getText().toString()));
+        networkManager.getTimetable(groups, 0, 0, "semester", onScheduleGetListener);
+    }
+
+    @OnClick(R.id.get_count_button)
+    void onGetCountButtonClick() {
+        int count = databaseManager.getTimetableEntriesCount();
+        Log.d(TAG, Integer.toString(count));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         App.getComponent().inject(this);
         Stetho.initializeWithDefaults(this);
-
-        networkManager.getTimetable(Lists.newArrayList("АПО-31", "АПО-11"), 0, 0, "semester", onScheduleGetListener);
+        ButterKnife.bind(this);
     }
 }

@@ -41,7 +41,7 @@ class Timetable implements DatabaseTable {
     private static final String KEY_LESSON_TUTORS = "lesson_tutors";
 
     boolean createTable(SQLiteDatabase db) {
-        String CREATE_TIMETABLE_TABLE = "CREATE TABLE " + TABLE_TIMETABLE +
+        String SQL_QUERY = "CREATE TABLE " + TABLE_TIMETABLE +
                 "(" +
                     KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     KEY_TITLE + " TEXT DEFAULT NULL," +
@@ -56,7 +56,7 @@ class Timetable implements DatabaseTable {
                     KEY_LESSON_TUTORS + " TEXT DEFAULT NULL" +
                 ")";
         try {
-            db.execSQL(CREATE_TIMETABLE_TABLE);
+            db.execSQL(SQL_QUERY);
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
             return false;
@@ -65,8 +65,9 @@ class Timetable implements DatabaseTable {
     }
 
     boolean dropTable(SQLiteDatabase db) {
+        String SQL_QUERY = String.format("DROP TABLE %s", TABLE_TIMETABLE);
         try {
-            db.execSQL("DROP TABLE " + TABLE_TIMETABLE);
+            db.execSQL(SQL_QUERY);
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
             return false;
@@ -74,43 +75,55 @@ class Timetable implements DatabaseTable {
         return true;
     }
 
-    boolean addEntries(SQLiteDatabase db, List<TimetableModel> objects) {
-        if (objects == null || objects.isEmpty()) {
+    boolean clearTable(SQLiteDatabase db) {
+        String SQL_QUERY = String.format("DELETE FROM %s", TABLE_TIMETABLE);
+        try {
+            db.execSQL(SQL_QUERY);
+        } catch (SQLException e) {
+            Log.d(TAG, new ErrorMessage(e).toString());
+            return false;
+        }
+        return true;
+    }
+
+    int countTableEntries(SQLiteDatabase db) {
+        int count = 0;
+        String SQL_QUERY = String.format("SELECT COUNT(*) FROM %s", TABLE_TIMETABLE);
+        Cursor cursor = db.rawQuery(SQL_QUERY, null);
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(0);
+            }
+        } catch (SQLException e) {
+            Log.d(TAG, new ErrorMessage(e).toString());
+            return 0;
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    boolean addEntry(SQLiteDatabase db, TimetableModel object) {
+        if (object == null) {
             return false;
         }
         db.beginTransaction();
         try {
-            StringBuilder INSERT_SQL = new StringBuilder(
-                    String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES",
-                            TABLE_TIMETABLE,
-                            KEY_TITLE,
-                            KEY_LESSON_TITLE,
-                            KEY_START_TIME,
-                            KEY_END_TIME,
-                            KEY_LESSON_TOPIC,
-                            KEY_AUDITORIUM_NUMBER,
-                            KEY_SCHEDULE_DATE,
-                            KEY_SUBGROUPS,
-                            KEY_TYPE_TITLE,
-                            KEY_LESSON_TUTORS
-                    )
-            );
-            for (TimetableModel object : objects) {
-                INSERT_SQL.append(" (")
-                        .append(object.getTitle()).append(", ")
-                        .append(object.getLessonTitle()).append(", ")
-                        .append(object.getStartTime()).append(", ")
-                        .append(object.getEndTime()).append(", ")
-                        .append(object.getLessonTopic()).append(", ")
-                        .append(object.getAuditoriumNumber()).append(", ")
-                        .append(object.getScheduleDate()).append(", ")
-                        .append(Joiner.on(",").join(object.getSubgroups())).append(", ")
-                        .append(object.getTypeTitle()).append(", ")
-                        .append(Joiner.on(",").join(object.getLessonTutors()))
-                        .append("), ");
-            }
-            INSERT_SQL.setLength(INSERT_SQL.length() - 2);
-            db.execSQL(INSERT_SQL.toString());
+            ContentValues values = new ContentValues();
+            values.put(KEY_TITLE, object.getTitle());
+            values.put(KEY_LESSON_TITLE, object.getLessonTitle());
+            values.put(KEY_START_TIME, object.getStartTime());
+            values.put(KEY_END_TIME, object.getEndTime());
+            values.put(KEY_LESSON_TOPIC, object.getLessonTopic());
+            values.put(KEY_AUDITORIUM_NUMBER, object.getAuditoriumNumber());
+            values.put(KEY_SCHEDULE_DATE, object.getScheduleDate());
+            values.put(KEY_SUBGROUPS, Joiner.on(",").join(object.getSubgroups()));
+            values.put(KEY_TYPE_TITLE, object.getTypeTitle());
+            values.put(KEY_LESSON_TUTORS, Joiner.on(",").join(object.getLessonTutors()));
+            db.insertOrThrow(TABLE_TIMETABLE, null, values);
             db.setTransactionSuccessful();
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
@@ -121,10 +134,41 @@ class Timetable implements DatabaseTable {
         return true;
     }
 
+    boolean addEntries(SQLiteDatabase db, List<TimetableModel> objects) {
+        if (objects == null || objects.isEmpty()) {
+            return false;
+        }
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            for (TimetableModel object : objects) {
+                values.put(KEY_TITLE, object.getTitle());
+                values.put(KEY_LESSON_TITLE, object.getLessonTitle());
+                values.put(KEY_START_TIME, object.getStartTime());
+                values.put(KEY_END_TIME, object.getEndTime());
+                values.put(KEY_LESSON_TOPIC, object.getLessonTopic());
+                values.put(KEY_AUDITORIUM_NUMBER, object.getAuditoriumNumber());
+                values.put(KEY_SCHEDULE_DATE, object.getScheduleDate());
+                values.put(KEY_SUBGROUPS, Joiner.on(",").join(object.getSubgroups()));
+                values.put(KEY_TYPE_TITLE, object.getTypeTitle());
+                values.put(KEY_LESSON_TUTORS, Joiner.on(",").join(object.getLessonTutors()));
+                db.insertOrThrow(TABLE_TIMETABLE, null, values);
+            }
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.d(TAG, new ErrorMessage(e).toString());
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+        return true;
+    }
+
+    // TODO TEST ME PLS :)
     Map<String, List<TimetableModel>> getEntries(SQLiteDatabase db, List<String> filters, String start, String end) {
         Map<String, List<TimetableModel>> map = new TreeMap<>();
-        String SELECT_SQL = String.format("SELECT * FROM %s", TABLE_TIMETABLE);
-        Cursor cursor = db.rawQuery(SELECT_SQL, null);
+        String SQL_QUERY = String.format("SELECT * FROM %s", TABLE_TIMETABLE);
+        Cursor cursor = db.rawQuery(SQL_QUERY, null);
         TimetableModel timetableModel = new TimetableModel();
         try {
             while (cursor.moveToNext()) {
