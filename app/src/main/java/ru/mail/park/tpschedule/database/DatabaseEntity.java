@@ -5,5 +5,6 @@ package ru.mail.park.tpschedule.database;
  * 06.11.17.
  */
 
+@SuppressWarnings("WeakerAccess")
 public interface DatabaseEntity {
 }

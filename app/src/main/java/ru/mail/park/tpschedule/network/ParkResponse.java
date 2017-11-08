@@ -11,6 +11,7 @@ import java.util.List;
  * 06.11.17
  */
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ParkResponse {
     @SerializedName("aSchedule")
     private List<ResponseObject> schedule;

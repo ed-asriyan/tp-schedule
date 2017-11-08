@@ -9,6 +9,7 @@ import ru.mail.park.tpschedule.network.ParkResponse;
  * 06.11.17.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class TimetableModel implements DatabaseEntity {
     private String title;
     private String lessonTitle;

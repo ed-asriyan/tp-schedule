@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
  * Created by yaches on 08.11.17
  */
 
+@SuppressWarnings("WeakerAccess")
 public class ListenerHandler<T> {
     private T listener;
 

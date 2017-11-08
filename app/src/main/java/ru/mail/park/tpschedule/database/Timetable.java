@@ -21,6 +21,7 @@ import ru.mail.park.tpschedule.utils.ErrorMessage;
  * 06.11.17.
  */
 
+@SuppressWarnings("unused")
 class Timetable implements DatabaseTable {
     private static final String TAG = Timetable.class.getSimpleName();
 

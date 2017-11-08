@@ -11,6 +11,7 @@ import java.util.Map;
  * Created by ed on 07.11.17
  */
 
+@SuppressWarnings("unused")
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String TAG = DatabaseManager.class.getSimpleName();
 
@@ -33,9 +34,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        if (!timetable.createTable(db)) {
-            // TODO do something here...
-        }
+        timetable.createTable(db);
     }
 
     @Override
