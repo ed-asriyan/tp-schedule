@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * 06.11.17
  */
 
-@SuppressWarnings({"FieldCanBeLocal"})
+@SuppressWarnings({"FieldCanBeLocal", "unused", "ConstantConditions"})
 public class NetworkManager {
     private static final String TAG = NetworkManager.class.getSimpleName();
 
@@ -45,7 +45,6 @@ public class NetworkManager {
             public void onResponse(@NonNull Call<ParkResponse> call, @NonNull Response<ParkResponse> response) {
                 try {
                     if (response.isSuccessful() && response.body() != null) {
-                        // TODO what to do will this highlight!??? NullPointerException
                         final List<ParkResponse.ResponseObject> schedule = response.body().getSchedule();
                         invokeSuccess(handler, schedule, groups);
                     } else {

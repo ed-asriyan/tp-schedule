@@ -1,5 +1,6 @@
 package ru.mail.park.tpschedule;
 
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,15 @@ import ru.mail.park.tpschedule.utils.ErrorMessage;
  */
 
 public class MainActivity extends AppCompatActivity {
+    static {
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectActivityLeaks()
+                .penaltyLog()
+                .penaltyDeath()
+                .build()
+        );
+    }
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @Inject
