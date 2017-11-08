@@ -31,11 +31,6 @@ import ru.mail.park.tpschedule.network.ParkResponse;
 import ru.mail.park.tpschedule.utils.ContainerBuilder;
 import ru.mail.park.tpschedule.utils.ErrorMessage;
 
-/*
- * TODO 1) implement logic for network manager to handle updates greatly
- * TODO 2) consider restructuring database
- */
-
 public class MainActivity extends AppCompatActivity {
     static {
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -72,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             Map<String, List<TimetableModel>> filteredSchedule = ContainerBuilder.toMap(schedule, filter);
             for (String group : filteredSchedule.keySet()) {
                 for (TimetableModel model : filteredSchedule.get(group)) {
-                    Log.d(TAG, group + " -> " + model.getTitle());
+                    Log.d(TAG, group + " -> " + model.getTitle() + " -> " + model.getScheduleDate());
                 }
             }
         }
@@ -89,15 +84,17 @@ public class MainActivity extends AppCompatActivity {
     Button updateButton;
     @BindView(R.id.get_count_button)
     Button getCountButton;
+    @BindView(R.id.get_entries_button)
+    Button getEntriesButton;
     @BindView(R.id.groups_field)
     EditText groupsEdit;
 
     @OnClick(R.id.update_button)
     void onUpdateButtonClick() {
         List<String> groups = Lists.newArrayList(Splitter.on(",")
-                        .trimResults()
-                        .omitEmptyStrings()
-                        .splitToList(groupsEdit.getText().toString()));
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(groupsEdit.getText().toString()));
         networkManager.getTimetable(groups, 0, 0, "semester", onScheduleGetListener);
     }
 
@@ -105,6 +102,20 @@ public class MainActivity extends AppCompatActivity {
     void onGetCountButtonClick() {
         int count = databaseManager.getTimetableEntriesCount();
         Log.d(TAG, Integer.toString(count));
+    }
+
+    @OnClick(R.id.get_entries_button)
+    void onGetEntriesButtonClick() {
+        List<String> groups = Lists.newArrayList(Splitter.on(",")
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(groupsEdit.getText().toString()));
+        Map<String, List<TimetableModel>> entries = databaseManager.getTimetableEntries(groups);
+        for (String group : entries.keySet()) {
+            for (TimetableModel model : entries.get(group)) {
+                Log.d(TAG, group + " -> " + model.getTitle() + " -> " + model.getScheduleDate());
+            }
+        }
     }
 
     @Override

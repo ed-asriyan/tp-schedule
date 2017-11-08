@@ -70,9 +70,9 @@ public class DatabaseManager extends SQLiteOpenHelper {
         return timetable.addEntries(db, schedule);
     }
 
-    public Map<String, List<TimetableModel>> getTimetableEntries(List<String> filters, String start, String end) {
+    public Map<String, List<TimetableModel>> getTimetableEntries(List<String> filters) {
         SQLiteDatabase db = getReadableDatabase();
-        return timetable.getEntries(db, filters, start, end);
+        return timetable.getEntries(db, filters);
     }
 
     public int getTimetableEntriesCount() {

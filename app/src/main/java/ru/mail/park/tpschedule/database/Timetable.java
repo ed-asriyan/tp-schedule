@@ -29,7 +29,6 @@ class Timetable implements DatabaseTable {
     private static final String TABLE_TIMETABLE = "timetable";
 
     // Timetable table columns
-    private static final String KEY_ID = "id";
     private static final String KEY_TITLE = "title";
     private static final String KEY_LESSON_TITLE = "lesson_title";
     private static final String KEY_START_TIME = "start_time";
@@ -44,7 +43,6 @@ class Timetable implements DatabaseTable {
     boolean createTable(SQLiteDatabase db) {
         String SQL_QUERY = "CREATE TABLE " + TABLE_TIMETABLE +
                 "(" +
-                    KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     KEY_TITLE + " TEXT DEFAULT NULL," +
                     KEY_LESSON_TITLE + " TEXT DEFAULT NULL," +
                     KEY_START_TIME + " TEXT DEFAULT NULL," +
@@ -165,14 +163,13 @@ class Timetable implements DatabaseTable {
         return true;
     }
 
-    // TODO TEST ME PLS :)
-    Map<String, List<TimetableModel>> getEntries(SQLiteDatabase db, List<String> filters, String start, String end) {
-        Map<String, List<TimetableModel>> map = new TreeMap<>();
+    Map<String, List<TimetableModel>> getEntries(SQLiteDatabase db, List<String> filters) {
+        Map<String, List<TimetableModel>> schedule = new TreeMap<>();
         String SQL_QUERY = String.format("SELECT * FROM %s", TABLE_TIMETABLE);
         Cursor cursor = db.rawQuery(SQL_QUERY, null);
-        TimetableModel timetableModel = new TimetableModel();
         try {
             while (cursor.moveToNext()) {
+                TimetableModel timetableModel = new TimetableModel();
                 timetableModel.setTitle(cursor.getString(cursor.getColumnIndex(KEY_TITLE)));
                 timetableModel.setLessonTitle(cursor.getString(cursor.getColumnIndex(KEY_LESSON_TITLE)));
                 timetableModel.setStartTime(cursor.getString(cursor.getColumnIndex(KEY_START_TIME)));
@@ -193,6 +190,15 @@ class Timetable implements DatabaseTable {
                                 .omitEmptyStrings()
                                 .splitToList(cursor.getString(cursor.getColumnIndex(KEY_LESSON_TUTORS))))
                 );
+                for (String subgroup : filters) {
+                    if (timetableModel.getSubgroups().contains(subgroup)) {
+                        if (!schedule.containsKey(subgroup)) {
+                            schedule.put(subgroup, Lists.newArrayList(timetableModel));
+                        } else {
+                            schedule.get(subgroup).add(timetableModel);
+                        }
+                    }
+                }
             }
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
@@ -202,6 +208,6 @@ class Timetable implements DatabaseTable {
                 cursor.close();
             }
         }
-        return map;
+        return schedule;
     }
 }
