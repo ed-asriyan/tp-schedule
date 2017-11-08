@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ru.mail.park.tpschedule.utils.ContainerBuilder;
 import ru.mail.park.tpschedule.utils.ErrorMessage;
 
 /**
@@ -166,7 +167,7 @@ class Timetable implements DatabaseTable {
 
     List<TimetableModel> getEntries(SQLiteDatabase db, List<String> filters) {
         List<TimetableModel> schedule = new ArrayList<>();
-        String SQL_QUERY = String.format("SELECT * FROM %s ORDER BY %s", TABLE_TIMETABLE, KEY_SCHEDULE_DATE);
+        String SQL_QUERY = String.format("SELECT * FROM %s", TABLE_TIMETABLE);
         Cursor cursor = db.rawQuery(SQL_QUERY, null);
         try {
             while (cursor.moveToNext()) {
@@ -197,6 +198,7 @@ class Timetable implements DatabaseTable {
                     }
                 }
             }
+            ContainerBuilder.sort(schedule);
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
             return null;

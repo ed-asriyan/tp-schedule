@@ -1,9 +1,15 @@
 package ru.mail.park.tpschedule.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import ru.mail.park.tpschedule.database.TimetableModel;
@@ -23,12 +29,7 @@ public class ContainerBuilder {
                 newList.add(new TimetableModel(object));
             }
         }
-        Collections.sort(newList, new Comparator<TimetableModel>() {
-            @Override
-            public int compare(TimetableModel o1, TimetableModel o2) {
-                return o1.getScheduleDate().compareTo(o2.getScheduleDate());
-            }
-        });
+        sort(newList);
         return newList;
     }
 
@@ -42,5 +43,22 @@ public class ContainerBuilder {
             }
         }
         return filteredList;
+    }
+
+    public static void sort(List<TimetableModel> list) {
+        Collections.sort(list, new Comparator<TimetableModel>() {
+            @Override
+            public int compare(TimetableModel o1, TimetableModel o2) {
+                DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+                Date d1, d2;
+                try {
+                    d1 = dateFormat.parse(o1.getScheduleDate());
+                    d2 = dateFormat.parse(o2.getScheduleDate());
+                } catch (ParseException e) {
+                    throw new IllegalArgumentException("Invalid date format!");
+                }
+                return d1.compareTo(d2);
+            }
+        });
     }
 }
