@@ -39,7 +39,9 @@ public class ContainerBuilder {
     public static List<TimetableModel> toList(List<ParkResponse.ResponseObject> sourceList) {
         List<TimetableModel> list = new ArrayList<>();
         for (ParkResponse.ResponseObject object : sourceList) {
-            list.add(new TimetableModel(object));
+            if (Objects.equals(object.getTypeEntity(), LESSON)) {
+                list.add(new TimetableModel(object));
+            }
         }
         return list;
     }

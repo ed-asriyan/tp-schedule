@@ -5,7 +5,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -13,8 +12,6 @@ import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import ru.mail.park.tpschedule.database.TimetableModel;
-import ru.mail.park.tpschedule.utils.ContainerBuilder;
 
 /**
  * Created by lieroz

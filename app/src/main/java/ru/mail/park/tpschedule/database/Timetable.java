@@ -50,9 +50,9 @@ class Timetable implements DatabaseTable {
                     KEY_END_TIME + " TEXT DEFAULT NULL," +
                     KEY_LESSON_TOPIC + " TEXT DEFAULT NULL," +
                     KEY_AUDITORIUM_NUMBER + " TEXT DEFAULT NULL," +
-                    KEY_SCHEDULE_DATE + " TEXT DEFAULT NULL" +
-                    KEY_SUBGROUPS + " TEXT DEFAULT NULL" +
-                    KEY_TYPE_TITLE + " TEXT DEFAULT NULL" +
+                    KEY_SCHEDULE_DATE + " TEXT DEFAULT NULL," +
+                    KEY_SUBGROUPS + " TEXT DEFAULT NULL," +
+                    KEY_TYPE_TITLE + " TEXT DEFAULT NULL," +
                     KEY_LESSON_TUTORS + " TEXT DEFAULT NULL" +
                 ")";
         try {
@@ -80,7 +80,6 @@ class Timetable implements DatabaseTable {
         }
         db.beginTransaction();
         try {
-            ContentValues values = new ContentValues();
             StringBuilder INSERT_SQL = new StringBuilder(
                     String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES",
                             TABLE_TIMETABLE,

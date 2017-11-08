@@ -46,9 +46,13 @@ public class DatabaseManager extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addTimetableEntries(List<TimetableModel> objects) {
+    public boolean updateTimetable(List<TimetableModel> schedule) {
+        return false;
+    }
+
+    public boolean addTimetableEntries(List<TimetableModel> schedule) {
         SQLiteDatabase db = getWritableDatabase();
-        return timetable.addEntries(db, objects);
+        return timetable.addEntries(db, schedule);
     }
 
     public Map<String, List<TimetableModel>> getTimetableEntries(List<String> filters, String start, String end) {

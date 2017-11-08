@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import ru.mail.park.tpschedule.database.DatabaseManager;
 import ru.mail.park.tpschedule.database.TimetableModel;
 import ru.mail.park.tpschedule.injection.App;
@@ -45,12 +47,12 @@ public class MainActivity extends AppCompatActivity {
         // All updates write here
         @Override
         public void onSuccess(final List<ParkResponse.ResponseObject> schedule, List<String> filter) {
-//            databaseExecutor.submit(new Runnable() {
-//                @Override
-//                public void run() {
-//                    databaseManager.addTimetableEntries(ContainerBuilder.toList(schedule));
-//                }
-//            });
+            databaseExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    databaseManager.addTimetableEntries(ContainerBuilder.toList(schedule));
+                }
+            });
             Map<String, List<TimetableModel>> filteredSchedule = ContainerBuilder.toMap(schedule, filter);
             for (String group : filteredSchedule.keySet()) {
                 for (TimetableModel model : filteredSchedule.get(group)) {
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         App.getComponent().inject(this);
+        Stetho.initializeWithDefaults(this);
 
         networkManager.getTimetable(Lists.newArrayList("АПО-31", "АПО-11"), 0, 0, "semester", onScheduleGetListener);
     }
