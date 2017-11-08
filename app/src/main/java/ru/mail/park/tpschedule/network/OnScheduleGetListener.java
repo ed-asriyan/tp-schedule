@@ -7,7 +7,7 @@ import java.util.List;
  */
 
 public interface OnScheduleGetListener {
-    void onSuccess(List<ParkResponse.ResponseObject> schedule, List<String> filter);
+    void onSuccess(List<ParkResponse.ResponseObject> result);
 
     void onFailure(Throwable error);
 }

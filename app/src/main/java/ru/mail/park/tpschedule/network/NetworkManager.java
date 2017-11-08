@@ -72,7 +72,7 @@ public class NetworkManager {
             public void run() {
                 OnScheduleGetListener listener = handler.getListener();
                 if (listener != null) {
-                    listener.onSuccess(schedule, groups);
+                    listener.onSuccess(schedule);
                 }
             }
         });

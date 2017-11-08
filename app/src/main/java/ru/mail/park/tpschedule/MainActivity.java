@@ -3,6 +3,8 @@ package ru.mail.park.tpschedule;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +15,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import ru.mail.park.tpschedule.adapters.ScheduleViewAdapter;
 import ru.mail.park.tpschedule.database.DatabaseManager;
 import ru.mail.park.tpschedule.database.TimetableModel;
 import ru.mail.park.tpschedule.injection.App;
@@ -57,19 +59,18 @@ public class MainActivity extends AppCompatActivity {
     private OnScheduleGetListener onScheduleGetListener = new OnScheduleGetListener() {
         // All updates write here
         @Override
-        public void onSuccess(final List<ParkResponse.ResponseObject> schedule, List<String> filter) {
+        public void onSuccess(final List<ParkResponse.ResponseObject> result) {
+            final List<TimetableModel> fullSchedule = ContainerBuilder.transformResponseList(result);
             databaseExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    databaseManager.updateSchedule(ContainerBuilder.toList(schedule));
+                    databaseManager.updateSchedule(fullSchedule);
                 }
             });
-            Map<String, List<TimetableModel>> filteredSchedule = ContainerBuilder.toMap(schedule, filter);
-            for (String group : filteredSchedule.keySet()) {
-                for (TimetableModel model : filteredSchedule.get(group)) {
-                    Log.d(TAG, group + " -> " + model.getTitle() + " -> " + model.getScheduleDate());
-                }
-            }
+            List<String> groups = getGroups();
+            currentSchedule = ContainerBuilder.filter(fullSchedule, groups);
+            adapter.setData(currentSchedule);
+            adapter.notifyDataSetChanged();
         }
 
         @Override
@@ -88,13 +89,12 @@ public class MainActivity extends AppCompatActivity {
     Button getEntriesButton;
     @BindView(R.id.groups_field)
     EditText groupsEdit;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
 
     @OnClick(R.id.update_button)
     void onUpdateButtonClick() {
-        List<String> groups = Lists.newArrayList(Splitter.on(",")
-                .trimResults()
-                .omitEmptyStrings()
-                .splitToList(groupsEdit.getText().toString()));
+        List<String> groups = getGroups();
         networkManager.getTimetable(groups, 0, 0, "semester", onScheduleGetListener);
     }
 
@@ -106,17 +106,15 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.get_entries_button)
     void onGetEntriesButtonClick() {
-        List<String> groups = Lists.newArrayList(Splitter.on(",")
-                .trimResults()
-                .omitEmptyStrings()
-                .splitToList(groupsEdit.getText().toString()));
-        Map<String, List<TimetableModel>> entries = databaseManager.getTimetableEntries(groups);
-        for (String group : entries.keySet()) {
-            for (TimetableModel model : entries.get(group)) {
-                Log.d(TAG, group + " -> " + model.getTitle() + " -> " + model.getScheduleDate());
-            }
+        List<String> groups = getGroups();
+        List<TimetableModel> entries = databaseManager.getTimetableEntries(groups);
+        for (TimetableModel model : entries) {
+            Log.d(TAG, model.getSubgroups() + " -> " + model.getTitle() + " -> " + model.getScheduleDate());
         }
     }
+
+    List<TimetableModel> currentSchedule;
+    private ScheduleViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,5 +124,19 @@ public class MainActivity extends AppCompatActivity {
         App.getComponent().inject(this);
         Stetho.initializeWithDefaults(this);
         ButterKnife.bind(this);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        currentSchedule = databaseManager.getTimetableEntries(Lists.newArrayList("АПО-31"));
+        adapter = new ScheduleViewAdapter(currentSchedule);
+        recyclerView.setAdapter(adapter);
+    }
+
+    // Cap made for testing purposes
+    private List<String> getGroups() {
+        return Lists.newArrayList(Splitter.on(",")
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToList(groupsEdit.getText().toString()));
     }
 }

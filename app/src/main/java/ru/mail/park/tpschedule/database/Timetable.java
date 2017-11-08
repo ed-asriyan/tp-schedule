@@ -10,6 +10,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -163,9 +164,9 @@ class Timetable implements DatabaseTable {
         return true;
     }
 
-    Map<String, List<TimetableModel>> getEntries(SQLiteDatabase db, List<String> filters) {
-        Map<String, List<TimetableModel>> schedule = new TreeMap<>();
-        String SQL_QUERY = String.format("SELECT * FROM %s", TABLE_TIMETABLE);
+    List<TimetableModel> getEntries(SQLiteDatabase db, List<String> filters) {
+        List<TimetableModel> schedule = new ArrayList<>();
+        String SQL_QUERY = String.format("SELECT * FROM %s ORDER BY %s", TABLE_TIMETABLE, KEY_SCHEDULE_DATE);
         Cursor cursor = db.rawQuery(SQL_QUERY, null);
         try {
             while (cursor.moveToNext()) {
@@ -192,11 +193,7 @@ class Timetable implements DatabaseTable {
                 );
                 for (String subgroup : filters) {
                     if (timetableModel.getSubgroups().contains(subgroup)) {
-                        if (!schedule.containsKey(subgroup)) {
-                            schedule.put(subgroup, Lists.newArrayList(timetableModel));
-                        } else {
-                            schedule.get(subgroup).add(timetableModel);
-                        }
+                        schedule.add(timetableModel);
                     }
                 }
             }
