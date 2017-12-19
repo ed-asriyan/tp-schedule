@@ -42,7 +42,7 @@ class Timetable implements DatabaseTable {
     private static final String KEY_TYPE_TITLE = "type_title";
     private static final String KEY_LESSON_TUTORS = "lesson_tutors";
 
-    boolean createTable(SQLiteDatabase db) {
+    void createTable(SQLiteDatabase db) {
         String SQL_QUERY = "CREATE TABLE " + TABLE_TIMETABLE +
                 "(" +
                     KEY_TITLE + " TEXT DEFAULT NULL," +
@@ -60,31 +60,25 @@ class Timetable implements DatabaseTable {
             db.execSQL(SQL_QUERY);
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
-            return false;
         }
-        return true;
     }
 
-    boolean dropTable(SQLiteDatabase db) {
+    void dropTable(SQLiteDatabase db) {
         String SQL_QUERY = String.format("DROP TABLE %s", TABLE_TIMETABLE);
         try {
             db.execSQL(SQL_QUERY);
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
-            return false;
         }
-        return true;
     }
 
-    boolean clearTable(SQLiteDatabase db) {
+    void clearTable(SQLiteDatabase db) {
         String SQL_QUERY = String.format("DELETE FROM %s", TABLE_TIMETABLE);
         try {
             db.execSQL(SQL_QUERY);
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
-            return false;
         }
-        return true;
     }
 
     int countTableEntries(SQLiteDatabase db) {
@@ -135,9 +129,9 @@ class Timetable implements DatabaseTable {
         return true;
     }
 
-    boolean addEntries(SQLiteDatabase db, List<TimetableModel> objects) {
+    void addEntries(SQLiteDatabase db, List<TimetableModel> objects) {
         if (objects == null || objects.isEmpty()) {
-            return false;
+            return;
         }
         db.beginTransaction();
         try {
@@ -158,11 +152,9 @@ class Timetable implements DatabaseTable {
             db.setTransactionSuccessful();
         } catch (SQLException e) {
             Log.d(TAG, new ErrorMessage(e).toString());
-            return false;
         } finally {
             db.endTransaction();
         }
-        return true;
     }
 
     List<TimetableModel> getEntries(SQLiteDatabase db, List<String> filters) {

@@ -10,13 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.facebook.stetho.Stetho;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
@@ -50,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     DatabaseManager databaseManager;
 
-    // Wrap all database communication into this executor
-    private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
-
     /*
      * Called after timetable was returned from network request to TP server
      */
@@ -60,13 +54,8 @@ public class MainActivity extends AppCompatActivity {
         // All updates write here
         @Override
         public void onSuccess(final List<ParkResponse.ResponseObject> result) {
-            final List<TimetableModel> fullSchedule = ContainerBuilder.transformResponseList(result);
-            databaseExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    databaseManager.updateSchedule(fullSchedule);
-                }
-            });
+            List<TimetableModel> fullSchedule = ContainerBuilder.transformResponseList(result);
+            databaseManager.updateSchedule(fullSchedule);
             List<String> groups = getGroups();
             currentSchedule = ContainerBuilder.filter(fullSchedule, groups);
             adapter.setData(currentSchedule);
@@ -122,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         App.getComponent().inject(this);
-        Stetho.initializeWithDefaults(this);
         ButterKnife.bind(this);
 
         recyclerView.setHasFixedSize(true);
